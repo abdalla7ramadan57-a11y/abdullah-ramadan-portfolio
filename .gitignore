@@ -1,0 +1,4 @@
+# local working folders — not part of the site
+MOGRT-OneClick-Style-Packager/
+dist/
+.claude/
