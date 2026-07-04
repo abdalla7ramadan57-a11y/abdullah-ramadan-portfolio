@@ -322,40 +322,6 @@ section{padding:110px 0;position:relative}
 .cf-card.playing .play-pulse{display:none}
 .cf-card.playing .cf-label{opacity:0;pointer-events:none;transition:opacity .3s}
 
-/* ============ Featured Projects — bento ============ */
-.bento{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:230px;gap:20px}
-.bento-card{
-  position:relative;border-radius:var(--radius-card);overflow:hidden;
-  background:var(--glass);border:1px solid var(--glass-border);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  transition:transform .3s var(--ease-out),box-shadow .35s,border-color .35s;
-  display:flex;flex-direction:column;justify-content:flex-end;
-}
-.bento-card::before{content:"";position:absolute;inset:0 0 auto;height:1px;background:rgba(255,255,255,0.1)}
-.bento-card:hover{transform:translateY(-8px);border-color:rgba(255,122,26,0.35);box-shadow:var(--glow-shadow)}
-.bento-big{grid-column:span 2;grid-row:span 2}
-.bento-cover{position:absolute;inset:0;overflow:hidden}
-.bento-cover .reel-fake{transition:transform .6s var(--ease-out)}
-.bento-card:hover .reel-fake{transform:scale(1.05)}
-.bento-cover::after{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 35%,rgba(8,7,6,0.92));
-}
-.bento-info{position:relative;z-index:2;padding:22px}
-.bento-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.tag{
-  font-size:10.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
-  padding:4px 11px;border-radius:999px;
-  background:rgba(255,122,26,0.12);border:1px solid rgba(255,122,26,0.3);color:var(--orange);
-}
-.bento-info h3{font-size:20px;margin-bottom:4px}
-.bento-info .style-line{font-size:13.5px;color:var(--text-muted)}
-.bento-result{
-  margin-top:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;color:var(--orange);
-  display:flex;align-items:center;gap:8px;
-}
-.bento-result::before{content:"↗";font-size:14px}
-
 /* ============ Services ============ */
 .services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
 .svc{
@@ -532,8 +498,6 @@ footer{border-top:1px solid var(--hairline);padding:40px 0}
   .hero-grid{grid-template-columns:1fr;text-align:center;gap:70px}
   .hero .sub{margin-left:auto;margin-right:auto}
   .cta-row,.stats-row{justify-content:center}
-  .bento{grid-template-columns:repeat(2,1fr)}
-  .bento-big{grid-column:span 2}
   .services-grid{grid-template-columns:repeat(2,1fr)}
   .about-grid{grid-template-columns:1fr;gap:48px}
   .about-visual{max-width:420px;margin:0 auto}
@@ -544,8 +508,6 @@ footer{border-top:1px solid var(--hairline);padding:40px 0}
   .nav .btn-primary{display:none}
   .burger{display:block}
   .services-grid{grid-template-columns:1fr}
-  .bento{grid-template-columns:1fr;grid-auto-rows:280px}
-  .bento-big{grid-column:span 1;grid-row:span 1}
   .process-track{grid-template-columns:1fr;gap:36px;text-align:left}
   .process-line{top:0;bottom:0;left:23px;right:auto;width:2px;height:auto}
   .process-line-fill{width:100%!important;height:var(--fill,0%);transition:height .2s linear}
@@ -590,7 +552,6 @@ footer{border-top:1px solid var(--hairline);padding:40px 0}
     <a href="#top" class="logo">ABDULLAH<span>RAMADAN</span></a>
     <ul class="nav-links">
       <li><a href="#work">Work</a></li>
-      <li><a href="#projects">Projects</a></li>
       <li><a href="#services">Services</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#process">Process</a></li>
@@ -603,7 +564,6 @@ footer{border-top:1px solid var(--hairline);padding:40px 0}
 </nav>
 <div class="mobile-menu" id="mobileMenu">
   <a href="#work">Work</a>
-  <a href="#projects">Projects</a>
   <a href="#services">Services</a>
   <a href="#about">About</a>
   <a href="#process">Process</a>
@@ -664,64 +624,6 @@ footer{border-top:1px solid var(--hairline);padding:40px 0}
       <button class="cf-arrow" id="cfPrev" aria-label="Previous video">←</button>
       <div class="cf-dots" id="cfDots"></div>
       <button class="cf-arrow" id="cfNext" aria-label="Next video">→</button>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FEATURED PROJECTS ============ -->
-<section id="projects">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">Case Studies</p>
-      <h2>Results, Not Just Reels.</h2>
-      <p>Selected client work with measurable outcomes.</p>
-    </div>
-    <div class="bento">
-      <article class="bento-card bento-big reveal">
-        <div class="bento-cover"><div class="reel-fake"></div></div>
-        <div class="bento-info">
-          <div class="bento-tags"><span class="tag">D2C Fashion Brand</span><span class="tag">Instagram</span></div>
-          <h3>Summer Drop Campaign</h3>
-          <p class="style-line">Fast-paced, hook-driven cut synced to trending audio</p>
-          <p class="bento-result">+2.4M views in 30 days</p>
-        </div>
-      </article>
-      <article class="bento-card reveal">
-        <div class="bento-cover"><div class="reel-fake"></div></div>
-        <div class="bento-info">
-          <div class="bento-tags"><span class="tag">SaaS Startup</span><span class="tag">TikTok</span></div>
-          <h3>Founder Story Series</h3>
-          <p class="style-line">Talking-head retention edit with kinetic captions</p>
-          <p class="bento-result">3.1× watch-time lift</p>
-        </div>
-      </article>
-      <article class="bento-card reveal">
-        <div class="bento-cover"><div class="reel-fake"></div></div>
-        <div class="bento-info">
-          <div class="bento-tags"><span class="tag">Fitness Creator</span><span class="tag">YouTube</span></div>
-          <h3>Shorts Growth Engine</h3>
-          <p class="style-line">Rhythm-cut montages, beat-matched transitions</p>
-          <p class="bento-result">+180K subs in a quarter</p>
-        </div>
-      </article>
-      <article class="bento-card reveal">
-        <div class="bento-cover"><div class="reel-fake"></div></div>
-        <div class="bento-info">
-          <div class="bento-tags"><span class="tag">Restaurant Chain</span><span class="tag">Instagram</span></div>
-          <h3>Signature Dish Ads</h3>
-          <p class="style-line">Cinematic macro food edit, sizzle sound design</p>
-          <p class="bento-result">4.2% CTR on paid spend</p>
-        </div>
-      </article>
-      <article class="bento-card reveal">
-        <div class="bento-cover"><div class="reel-fake"></div></div>
-        <div class="bento-info">
-          <div class="bento-tags"><span class="tag">Podcast</span><span class="tag">TikTok</span></div>
-          <h3>Clip Machine</h3>
-          <p class="style-line">Hook-first podcast clips, auto-style captions</p>
-          <p class="bento-result">12M combined clip views</p>
-        </div>
-      </article>
     </div>
   </div>
 </section>
