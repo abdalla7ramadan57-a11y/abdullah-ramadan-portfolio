@@ -271,23 +271,44 @@ section{padding:110px 0;position:relative}
   border-color:transparent;box-shadow:0 6px 28px rgba(255,122,26,0.35);
 }
 
-.coverflow{position:relative;height:640px;perspective:1400px;margin:0 -32px}
+.coverflow{
+  position:relative;height:640px;perspective:1600px;margin:0 -32px;
+  cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y;
+}
+.coverflow.dragging{cursor:grabbing}
+.cyl-ring{
+  position:absolute;top:50%;left:50%;
+  transform-style:preserve-3d;will-change:transform;
+}
+.cyl-ring.snap{transition:transform .8s var(--ease-out)}
 .cf-card{
-  position:absolute;top:50%;left:50%;width:300px;aspect-ratio:9/17.5;
+  position:absolute;top:0;left:0;width:300px;aspect-ratio:9/17.5;
   border-radius:32px;padding:9px;
   background:linear-gradient(160deg,#262220,#131110 45%,#1d1a17);
   border:1px solid rgba(255,255,255,0.1);
   box-shadow:0 30px 80px rgba(0,0,0,0.55);
-  transition:transform .6s var(--ease-out),opacity .6s var(--ease-out),box-shadow .6s,filter .6s;
-  cursor:pointer;will-change:transform;
-  transform:translate(-50%,-50%);
+  transition:opacity .5s var(--ease-out),box-shadow .6s,border-color .6s;
+  cursor:pointer;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
 }
 .cf-card .phone-screen{border-radius:24px}
 .cf-card.center{
-  z-index:5;box-shadow:0 40px 100px rgba(0,0,0,0.6),0 0 70px rgba(255,122,26,0.22);
+  box-shadow:0 40px 100px rgba(0,0,0,0.6),0 0 70px rgba(255,122,26,0.22);
   border-color:rgba(255,122,26,0.45);
 }
-.cf-card.hidden-card{opacity:0;pointer-events:none}
+/* Drag hint pill with animated mouse */
+.drag-hint{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:11px;padding:10px 20px;border-radius:999px;
+  background:rgba(10,10,10,0.65);border:1px solid var(--glass-border);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  font-size:12px;letter-spacing:0.1em;color:var(--text-muted);
+  z-index:20;pointer-events:none;transition:opacity .5s;
+}
+.drag-hint.hide{opacity:0}
+.drag-hint .chev{color:var(--orange);font-size:15px;line-height:1}
+.drag-mouse{color:var(--orange);animation:hint-slide 1.6s ease-in-out infinite alternate}
+@keyframes hint-slide{from{transform:translateX(-8px)}to{transform:translateX(8px)}}
 .cf-label{
   position:absolute;left:16px;right:16px;bottom:18px;z-index:6;
   display:flex;align-items:center;justify-content:space-between;gap:8px;
@@ -517,11 +538,12 @@ footer{border-top:1px solid var(--hairline);padding:40px 0}
   .testi{flex:0 0 86%}
   /* Mobile showcase: vertical scroll-snap stack */
   .coverflow{height:auto;perspective:none;margin:0;display:flex;flex-direction:column;gap:26px;
-    max-height:78vh;overflow-y:auto;scroll-snap-type:y mandatory;padding:4px;border-radius:24px}
+    max-height:78vh;overflow-y:auto;scroll-snap-type:y mandatory;padding:4px;border-radius:24px;cursor:default}
   .coverflow::-webkit-scrollbar{display:none}
+  .cyl-ring{display:contents}
+  .drag-hint{display:none}
   .cf-card{position:relative;top:auto;left:auto;transform:none!important;opacity:1!important;
     width:min(320px,88%);margin:0 auto;scroll-snap-align:center;flex-shrink:0}
-  .cf-card.hidden-card{display:none}
   .cf-nav{display:none}
 }
 
@@ -619,7 +641,18 @@ footer{border-top:1px solid var(--hairline);padding:40px 0}
       <button class="filter-pill" data-filter="reels">Reels &amp; Edits</button>
       <button class="filter-pill" data-filter="ai">AI Videos</button>
     </div>
-    <div class="coverflow reveal" id="coverflow"><!-- cards injected by JS --></div>
+    <div class="coverflow reveal" id="coverflow">
+      <div class="cyl-ring" id="cylRing"><!-- cards injected by JS --></div>
+      <div class="drag-hint" id="dragHint" aria-hidden="true">
+        <span class="chev">‹</span>
+        <svg class="drag-mouse" width="15" height="23" viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="1" y="1" width="14" height="22" rx="7"/>
+          <line x1="8" y1="5" x2="8" y2="9"/>
+        </svg>
+        <span class="chev">›</span>
+        <span>HOLD &amp; DRAG TO ROTATE</span>
+      </div>
+    </div>
     <div class="cf-nav">
       <button class="cf-arrow" id="cfPrev" aria-label="Previous video">←</button>
       <div class="cf-dots" id="cfDots"></div>
@@ -907,6 +940,7 @@ const REELS = [
   {id:"9x4f0hgA9XM", title:"Cinematic Reel",      plat:"YOUTUBE", cat:"reels"},
   {id:"RO5pZ9r8jJ4", title:"Fast-Paced Promo",    plat:"YOUTUBE", cat:"reels"},
   {id:"w163QmhEOHU", title:"Retention Edit",      plat:"YOUTUBE", cat:"reels"},
+  {id:"JMLBUNcm_RE", title:"CGI Ad",              plat:"YOUTUBE", cat:"reels"},
   {id:"BicP6EuuDKU", title:"AI Concept 01",       plat:"YOUTUBE", cat:"ai"},
   {id:"5KT20FP18yk", title:"AI Concept 02",       plat:"YOUTUBE", cat:"ai"},
   {id:"c6220o0YIaI", title:"AI Concept 03",       plat:"YOUTUBE", cat:"ai"},
@@ -915,9 +949,14 @@ const REELS = [
 ];
 
 const coverflow = document.getElementById("coverflow");
+const ring      = document.getElementById("cylRing");
 const dotsWrap  = document.getElementById("cfDots");
+const dragHint  = document.getElementById("dragHint");
 let visible = [...REELS];
-let current = Math.floor(visible.length/2);
+let current = 0;
+let rot = 0;                    // cylinder rotation (deg)
+let cylStep = 0, cylRadius = 0; // recomputed per render
+function mod(n,m){ return ((n%m)+m)%m }
 
 function buildCard(reel){
   const card = document.createElement("article");
@@ -935,31 +974,39 @@ function buildCard(reel){
   return card;
 }
 
-function layout(){
-  const cards = coverflow.children;
-  const isMobile = mobileMQ.matches;
+/* 3D cylinder layout: cards sit on a ring, the ring rotates */
+function applyRing(snap){
+  if(mobileMQ.matches) return; // mobile uses scroll-snap stack, CSS handles it
+  ring.classList.toggle("snap", !!snap);
+  ring.style.transform = "translateZ("+(-cylRadius)+"px) rotateY("+rot+"deg)";
+  const cards = ring.children;
   for(let i=0;i<cards.length;i++){
-    const card = cards[i];
-    card.classList.remove("center","hidden-card");
-    if(isMobile) continue; // mobile uses scroll-snap stack, CSS handles it
-    const off = i - current;
-    if(Math.abs(off) > 2){ card.classList.add("hidden-card"); continue; }
-    const x = off * 240;
-    const z = -Math.abs(off) * 170;
-    const rotY = off * -16;
-    const scale = off === 0 ? 1 : 0.86 - Math.abs(off)*0.03;
-    card.style.transform = "translate(-50%,-50%) translateX("+x+"px) translateZ("+z+"px) rotateY("+rotY+"deg) scale("+scale+")";
-    card.style.opacity = off === 0 ? 1 : (0.55 - Math.abs(off)*0.15);
-    card.style.zIndex = 10 - Math.abs(off);
-    if(off === 0) card.classList.add("center");
+    let d = mod(i*cylStep + rot, 360);
+    if(d > 180) d -= 360;
+    const a = Math.abs(d);
+    cards[i].style.opacity = a <= cylStep/2 ? 1 : Math.max(0.12, 1 - a/120);
+    cards[i].classList.toggle("center", a < cylStep/2 + 0.5);
   }
-  // dots
+  current = mod(Math.round(-rot/cylStep), Math.max(visible.length,1));
+  const dots = dotsWrap.children;
+  for(let i=0;i<dots.length;i++) dots[i].classList.toggle("active", i===current);
+}
+
+function goTo(i, snap){
+  stopPlaying();
+  let target = -i*cylStep;
+  target += 360*Math.round((rot-target)/360); // shortest path
+  rot = target;
+  applyRing(snap !== false);
+}
+
+function buildDots(){
   dotsWrap.innerHTML = "";
   visible.forEach((_,i)=>{
     const d = document.createElement("button");
     d.className = "cf-dot"+(i===current?" active":"");
     d.setAttribute("aria-label","Go to video "+(i+1));
-    d.addEventListener("click",()=>{ stopPlaying(); current=i; layout(); });
+    d.addEventListener("click",()=>goTo(i));
     dotsWrap.appendChild(d);
   });
 }
@@ -991,30 +1038,54 @@ function playInCard(card, reel){
 
 function renderCarousel(){
   playingCard = null;
-  coverflow.innerHTML = "";
+  ring.innerHTML = "";
+  const N = Math.max(visible.length, 1);
+  cylStep = 360/N;
+  // radius so ~354px of arc per card: r = (cardW*1.18/2) / tan(pi/N)
+  cylRadius = N < 2 ? 0 : Math.max(300, Math.round(177/Math.tan(Math.PI/N)));
   visible.forEach((reel,i)=>{
     const card = buildCard(reel);
+    if(!mobileMQ.matches){
+      card.style.transform = "translate(-50%,-50%) rotateY("+(i*cylStep)+"deg) translateZ("+cylRadius+"px)";
+    }
     card.addEventListener("click",()=>{
-      if(!mobileMQ.matches && i !== current){ stopPlaying(); current = i; layout(); }
+      if(justDragged) return; // ignore the click that ends a drag
+      if(!mobileMQ.matches && i !== current) goTo(i);
       else playInCard(card, reel);
     });
-    coverflow.appendChild(card);
+    ring.appendChild(card);
   });
-  current = Math.min(current, Math.max(visible.length-1,0));
-  layout();
+  rot = 0; current = 0;
+  buildDots();
+  applyRing(false);
 }
 
-document.getElementById("cfPrev").addEventListener("click",()=>{ stopPlaying(); current=(current-1+visible.length)%visible.length; layout(); });
-document.getElementById("cfNext").addEventListener("click",()=>{ stopPlaying(); current=(current+1)%visible.length; layout(); });
+document.getElementById("cfPrev").addEventListener("click",()=>goTo(current-1));
+document.getElementById("cfNext").addEventListener("click",()=>goTo(current+1));
 mobileMQ.addEventListener("change", renderCarousel);
 
-/* drag / swipe on desktop coverflow */
-let dragX = null;
-coverflow.addEventListener("pointerdown",e=>{ if(!mobileMQ.matches) dragX = e.clientX; });
-window.addEventListener("pointerup",e=>{
+/* left-click + drag rotates the cylinder */
+let dragX = null, dragRot = 0, justDragged = false;
+coverflow.addEventListener("pointerdown",e=>{
+  if(mobileMQ.matches) return;
+  dragX = e.clientX; dragRot = rot; justDragged = false;
+  coverflow.classList.add("dragging");
+  if(dragHint) dragHint.classList.add("hide");
+});
+window.addEventListener("pointermove",e=>{
   if(dragX===null) return;
-  const dx = e.clientX - dragX; dragX = null;
-  if(Math.abs(dx) > 50){ stopPlaying(); current = (current + (dx<0?1:-1) + visible.length) % visible.length; layout(); }
+  const dx = e.clientX - dragX;
+  if(Math.abs(dx) > 5) justDragged = true;
+  rot = dragRot + dx*(cylStep/240);
+  applyRing(false);
+});
+window.addEventListener("pointerup",()=>{
+  if(dragX===null) return;
+  dragX = null;
+  coverflow.classList.remove("dragging");
+  if(justDragged) stopPlaying();
+  rot = Math.round(rot/cylStep)*cylStep; // snap to nearest card
+  applyRing(true);
 });
 window.addEventListener("keydown",e=>{ if(e.key==="Escape") stopPlaying(); });
 
@@ -1025,7 +1096,6 @@ document.getElementById("filters").addEventListener("click",e=>{
   btn.classList.add("active");
   const f = btn.dataset.filter;
   visible = f==="all" ? [...REELS] : REELS.filter(r=>r.cat===f);
-  current = Math.floor(visible.length/2);
   renderCarousel();
 });
 
