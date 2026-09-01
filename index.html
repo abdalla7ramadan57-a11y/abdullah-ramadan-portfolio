@@ -339,7 +339,7 @@ section{padding:110px 0;position:relative}
 .cf-card.center .play-pulse,.cf-card:hover .play-pulse{opacity:1}
 @media(max-width:760px){.cf-card .play-pulse{opacity:1}}
 /* Inline player inside the phone card */
-.cf-inline{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
+.cf-inline{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5;object-fit:cover;background:#000}
 .cf-card.playing .play-pulse{display:none}
 .cf-card.playing .cf-label{opacity:0;pointer-events:none;transition:opacity .3s}
 
@@ -951,7 +951,9 @@ const REELS = [
   {id:"c6220o0YIaI", title:"AI Concept 03",       plat:"YOUTUBE", cat:"ai"},
   {id:"fFFPyD_CW5Q", title:"AI Concept 04",       plat:"YOUTUBE", cat:"ai"},
   {id:"KbADfFqFMEs", title:"AI Concept 05",       plat:"YOUTUBE", cat:"ai"},
-  {id:"3FV2CdkWVio", title:"AI Concept 06",       plat:"YOUTUBE", cat:"ai"}
+  {id:"3FV2CdkWVio", title:"AI Concept 06",       plat:"YOUTUBE", cat:"ai"},
+  {src:"assets/videos/ai-ugc-01.mp4", poster:"assets/videos/ai-ugc-01.jpg", title:"AI UGC Ad 01", plat:"AI UGC", cat:"ai"},
+  {src:"assets/videos/ai-ugc-02.mp4", poster:"assets/videos/ai-ugc-02.jpg", title:"AI UGC Ad 02", plat:"AI UGC", cat:"ai"}
 ];
 
 const coverflow = document.getElementById("coverflow");
@@ -967,13 +969,17 @@ function mod(n,m){ return ((n%m)+m)%m }
 function buildCard(reel){
   const card = document.createElement("article");
   card.className = "cf-card";
-  // oar2.jpg is the vertical Shorts thumbnail; fall back to hqdefault if missing
+  const thumbImg = reel.src
+    // local upload: poster frame extracted from the file itself
+    ? '<img class="cf-thumb" alt="'+reel.title+'" src="'+reel.poster+'">'
+    // YouTube: oar2.jpg is the vertical Shorts thumbnail; fall back to hqdefault if missing
+    : '<img class="cf-thumb" alt="'+reel.title+'" ' +
+        'src="https://i.ytimg.com/vi/'+reel.id+'/oar2.jpg" ' +
+        'onerror="this.onerror=null;this.src=\'https://i.ytimg.com/vi/'+reel.id+'/hqdefault.jpg\'">';
   card.innerHTML =
     '<div class="phone-screen">' +
       '<div class="reel-fake"></div>' +
-      '<img class="cf-thumb" alt="'+reel.title+'" ' +
-        'src="https://i.ytimg.com/vi/'+reel.id+'/oar2.jpg" ' +
-        'onerror="this.onerror=null;this.src=\'https://i.ytimg.com/vi/'+reel.id+'/hqdefault.jpg\'">' +
+      thumbImg +
       '<div class="play-pulse"></div>' +
       '<div class="cf-label"><span>'+reel.title+'</span><span class="plat">'+reel.plat+'</span></div>' +
     '</div>';
@@ -1030,14 +1036,24 @@ function stopPlaying(){
 function playInCard(card, reel){
   if(playingCard === card) return;
   stopPlaying();
-  const iframe = document.createElement("iframe");
-  iframe.className = "cf-inline";
-  iframe.src = "https://www.youtube.com/embed/"+reel.id+"?autoplay=1&playsinline=1&rel=0&modestbranding=1";
-  iframe.title = reel.title;
-  iframe.allow = "autoplay; encrypted-media; fullscreen";
-  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+  let el;
+  if(reel.src){
+    el = document.createElement("video");
+    el.className = "cf-inline";
+    el.src = reel.src;
+    el.controls = true;
+    el.autoplay = true;
+    el.playsInline = true;
+  } else {
+    el = document.createElement("iframe");
+    el.className = "cf-inline";
+    el.src = "https://www.youtube.com/embed/"+reel.id+"?autoplay=1&playsinline=1&rel=0&modestbranding=1";
+    el.title = reel.title;
+    el.allow = "autoplay; encrypted-media; fullscreen";
+    el.referrerPolicy = "strict-origin-when-cross-origin";
+  }
   const screen = card.querySelector(".phone-screen");
-  screen.insertBefore(iframe, screen.querySelector(".cf-label"));
+  screen.insertBefore(el, screen.querySelector(".cf-label"));
   card.classList.add("playing");
   playingCard = card;
 }
