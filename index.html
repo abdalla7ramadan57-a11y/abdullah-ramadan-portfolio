@@ -275,7 +275,7 @@ section{padding:110px 0;position:relative}
 .coverflow{
   position:relative;display:flex;gap:22px;overflow-x:auto;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-  margin:0 -32px;padding:14px 32px 18px;
+  margin:0 -32px;padding:14px calc(50% - 140px) 18px;
   cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y;
   scrollbar-width:none;outline:none;
 }
@@ -524,7 +524,7 @@ footer{border-top:1px solid var(--hairline);padding:40px 0}
   .step-node{margin:0;flex-shrink:0}
   .step p{margin:0}
   .testi{flex:0 0 86%}
-  .coverflow{cursor:default;gap:16px}
+  .coverflow{cursor:default;gap:16px;padding-left:calc(50% - min(120px,34vw));padding-right:calc(50% - min(120px,34vw))}
   .cf-card{width:min(240px,68vw)}
   .drag-hint{display:none}
 }
@@ -1043,7 +1043,12 @@ function renderCarousel(){
   });
   current = 0;
   buildDots();
-  requestAnimationFrame(updateCenterCard);
+  requestAnimationFrame(()=>{
+    // Explicitly center the first card — natural scrollLeft:0 doesn't land
+    // exactly on its center, so without this a later card reads as "closest".
+    if(ring.children[0]) ring.children[0].scrollIntoView({behavior:"auto", inline:"center", block:"nearest"});
+    updateCenterCard();
+  });
 }
 
 document.getElementById("cfPrev").addEventListener("click",()=>goTo(current-1));
